@@ -1,6 +1,6 @@
 ---
 description: 'Guidelines and best practices for developing Lightning Web Components (LWC) on Salesforce Platform.'
-applyTo: '**/main/default/lwc/**'
+applyTo: '**/lwc/**'
 ---
 
 # LWC Development
@@ -8,21 +8,10 @@ applyTo: '**/main/default/lwc/**'
 ## 1. Component Usage
 
 ### Rule
-Prefer Salesforce Lightning Base Components (`lightning-*`) over plain HTML elements.
+You must use Salesforce Lightning Base Components (`lightning-*`) instead of plain HTML elements whenever possible.
+- <button> must always be replaced with <lightning-button>
+- <input> must always be replaced with <lightning-input>
 
-### Preferred
-```html
-<lightning-button label="Save"></lightning-button>
-<lightning-input label="Name"></lightning-input>
-<lightning-card title="Details"></lightning-card>
-```
-
-### Avoid
-```html
-<button>Save</button>
-<input type="text" />
-<div class="card"></div>
-```
 ### Exceptions
 - No equivalent Lightning component exists
 - Structural elements (div, span)
@@ -117,8 +106,15 @@ get isEmpty() {
     return !this.hasItems && !this.isLoading;
 }
 ```
+## 6. Data Fetching
 
-## 6. Array Handling
+### Rule
+Use `@wire` for read-only, reactive data fetching. Use imperative Apex for:
+  - user-initiated actions (e.g., button clicks)
+  - data mutations (create, update, delete)
+  - controlled execution flows
+
+## 7. Array Handling
 
 ### Rule
 Always use getters for array checks used in templates.
@@ -142,4 +138,57 @@ get isEmpty() {
 ### Avoid
 ```html
 <template if:true={items.length > 0}></template>
+```
+
+## 8. Error Handling
+
+### Rule
+Always handle errors explicitly and display them using a standardized error component (c-error-panel).
+
+### Example
+```html
+<template if:true={hasErrors}>
+  <c-error-panel errors={errors}></c-error-panel>
+</template>
+```
+
+## 9. Event Communication
+
+### Rule
+Use custom events for communication from child to parent components. Use `@api` properties for parent to child communication.
+
+### Guidelines
+- Use lowercase event names (e.g., `save`, `recordchange`)
+- Keep event payload (detail) minimal and structured
+
+## 9. Template vs DOM Elements
+
+### Rule
+Use `template` for rendering logic and structural directives (`for:each`, `if:true`, etc.). Use DOM elements (e.g., `div`, `span`) for layout and styling.
+
+```html
+<template if:true={hasItems}>
+    <div class="slds-p-around_medium">
+        
+        <template for:each={items} for:item="item">
+            <div key={item.id} class="slds-m-bottom_small">
+                <span>{item.name}</span>
+            </div>
+        </template>
+
+    </div>
+</template>
+```
+
+## 10. Template Iteration
+
+### Rule
+Always provide a unique key for each item in a list when using `for:each` directive.
+
+### Example
+```html
+<template for:each={items} for:item="item">
+    <div key={item.id}>
+        {item.name}
+    </div>
 ```
