@@ -25,16 +25,17 @@ applyTo: '**/*'
 
 ## Control Flow
 
-For simple validation logic:
-  - Default to a single conditional that checks all necessary conditions together
-  - Combine related checks into one `if` condition when it remains readable and within line length limits.
-  - Do not use early returns for simple validation logic
-  - Avoid splitting simple validations into multiple early returns.
-  - If a condition becomes too long or complex, refactor instead of splitting arbitrarily
+### Logic Execution
 
-Use early returns only when:
-  - The logic is complex (e.g., loops, SOQL queries, multiple processing steps)
-  - They significantly improve readability by reducing deeply nested structures
+- Combine related logical checks within the main body into a single `if` condition when it remains readable.
+- Do not split regular business logic into multiple arbitrary early returns.
+- If a regular control flow condition becomes too long or complex, refactor the logic into a helper function instead of splitting it.
+
+### Data Validation (Guard Clauses)
+
+- Use early returns (guard clauses) immediately after data retrieval or parameter input to exit early if data is invalid, null, or empty.
+- Keep data validation out of the main business logic and control flow to prevent deep nesting.
+- Ensure all method parameters and external variables are checked for null values before they are used in the business logic.
 
 ## Naming Conventions
 
@@ -44,6 +45,7 @@ Use early returns only when:
 - Avoid abbreviations unless widely understood
 - Avoid repeating domain context already implied by the class or scope
 - Avoid using names that are too similar to each other (e.g. `user` and `users`, `data` and `date`) to prevent confusion
+- Avoid magic numbers and hardcoded strings; extract them into well-named constants, enums, or configuration files to improve maintainability.
 
 ### Methods
 
@@ -83,12 +85,14 @@ Use early returns only when:
 - Only implement what is explicitly required by the specification.
 
 ### Allowed Changes
+
 - Code may be restructured if required to implement the requested change.
 - Restructuring should be minimal and limited to what is necessary.
   - Do not refactor or rewrite unaffected logic.
   - Preserve existing patterns and structures unless the change requires deviation
 
 ### Prohibited Changes
+
 - Do not change the behavior of the function beyond what is explicitly required by the specification.
 - Do not introduce additional logic, state, structure, or UI elements unless explicitly required by the specification.
 - Do not introduce alternative patterns (e.g., early returns, different control flow) unless the change makes it necessary.
