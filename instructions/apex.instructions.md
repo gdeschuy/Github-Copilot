@@ -108,21 +108,48 @@ Always explicitly handle null values to avoid runtime exceptions and ensure pred
     }
     ```
 
-## Test Coverage
+  ## SOQL Queries
 
-- All new or modified Apex logic must be covered by tests, aiming for the highest possible coverage.
-- Tests must cover all relevant execution paths and business behavior, not just basic execution.
-- Strive for near-complete coverage of new and changed code.
-- Never use @IsTest(SeeAllData=true).
-- Tests must validate business logic, not just achieve coverage.
-- Cover edge cases and boundary conditions where applicable.
-- No outdated or failing tests are allowed.
+  ### Formatting
 
-## Test Design
+  All SOQL queries must follow a consistent multi-line format for readability.
+    - The opening square bracket [ must always be followed by a newline
+    - Each clause (SELECT, FROM, WHERE) must be on its own line
+    - All clauses must always be written in uppercase
+    - Fields must be comma-separated with no space before commas and one space after
+    - Conditions must be on separate lines, each starting with AND / OR
+    - The closing bracket ] must be placed on its own line
+  
+  ```apex
+  List<Account> accounts = [
+    SELECT Id, Name, Industry
+    FROM Account
+    WHERE Industry = 'Technology'
+  ];
+  
+  for (Account accnt : [
+    SELECT Id, Name
+    FROM Account
+    WHERE Name = 'Test Account'
+  ]) {
+    // logic
+  }
+  ```
 
-- Follow Arrange–Act–Assert structure.
-- Test one scenario per method.
-- Cover both positive and negative cases where relevant.
-- Avoid test interdependencies; each test must be independent and deterministic.
-- Each test must include assertions with descriptive failure messages.
-- Use @TestSetup to create reusable test data.
+### Selectivity
+
+- When a SOQL query is used inside a for loop, all filtering logic must be applied in the WHERE clause
+- Every SOQL query must include a WHERE clause
+- Ensure filters use indexed or selective fields where possible
+- Use `LIMIT` to restrict results when appropriate
+- Do not perform full-table scans
+
+### Dynamic SOQL
+
+When using dynamic SOQL, ensure proper escaping to prevent SOQL injection:
+
+```apex
+String name = String.escapeSingleQuotes(userInput);
+String query = 'SELECT Id, Name FROM Account WHERE Name = \'' + name + '\'';
+List<SObject> results = Database.query(query);
+```
