@@ -5,24 +5,40 @@ applyTo: '**/*'
 
 # General Coding Standards
 
-## Code Structure
-- Use a consistent top-down structure: main logic first, helper functions after, and data structures at the bottom, to improve readability and maintainability.
-
 ## Function Design
-- Keep functions small and focused on a single responsibility
+
+### General Principles
+
 - Prefer pure functions for business logic. Isolate side effects (e.g. database operations, logging) to dedicated layers to improve testability and predictability
-- Use control flow constructs (e.g., if/else, switch, early returns, break, continue) to keep logic clear and reduce nesting, but only when they preserve readability and a predictable execution flow.
 - Separate command functions (change state) from query functions (return info)
 - Avoid unintended side effects; functions should not modify external state unless it is explicit and part of their responsibility
 - Avoid nesting beyond 3 levels deep; refactor complex blocks into smaller, single-purpose functions
 - Avoid horizontal scrolling in code; keep lines to a reasonable length (e.g., 80-120 characters) to improve readability
 - Avoid global variables; encapsulate state within functions or modules
-- Declare variables in alphabetical order when possible to improve readability and maintainability
 - Limit argument count to 3 or fewer
+
+### Structure
+
+- Keep functions small and focused on a single responsibility
+- Use a consistent top-down structure: main logic first, helper functions after, and data structures at the bottom, to improve readability and maintainability.
+- Group related elements together; use alphabetical ordering within those groups when it improves readability.
+
+## Control Flow
+
+For simple validation logic:
+  - Default to a single conditional that checks all necessary conditions together
+  - Combine related checks into one `if` condition when it remains readable and within line length limits.
+  - Do not use early returns for simple validation logic
+  - Avoid splitting simple validations into multiple early returns.
+  - If a condition becomes too long or complex, refactor instead of splitting arbitrarily
+
+Use early returns only when:
+  - The logic is complex (e.g., loops, SOQL queries, multiple processing steps)
+  - They significantly improve readability by reducing deeply nested structures
 
 ## Naming Conventions
 
-### General
+### General Principles
 
 - Use intention-revealing, searchable names
 - Avoid abbreviations unless widely understood
@@ -42,14 +58,18 @@ applyTo: '**/*'
 - Keep variable names concise; avoid unnecessary or redundant words while preserving clarity
 - Avoid using names that include the variable type (e.g. `userList`, `isActiveFlag`) unless it adds clarity where the type is not obvious from context
 - Avoid using names that include implementation details (e.g. `tempData`) that do not convey the purpose or intent
+- Declare variables in the narrowest possible scope, preferably within the block where they are used.
+- Do not declare variables at the top of a function unless they are used throughout the function.
 
 ## Comments
+
 - The code should be self-explanatory; do not add comments unless absolutely necessary.
 - Write comments to explain why something is done, not what the code is doing.
 - Avoid using comments to explain complex code; instead, refactor the code to be simpler and more understandable
 - Delete code that is no longer needed instead of commenting it out
 
 ## Error Handling
+
 - Handle errors gracefully and provide informative messages
 - Use try/catch for expected errors; let unexpected errors propagate
 - Use consistent error handling strategies (e.g., try/catch, error-first callbacks, or promise rejections) based on the language and context
