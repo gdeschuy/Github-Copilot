@@ -47,7 +47,7 @@ if (value == 0) { }
 
 ## 4. Array Iteration
 
-### 🔹 Rule
+### Rule
 
 Choose the appropriate iteration method based on data size, intent, and readability:
 - Use `map()` when transforming arrays into a new array of the same size
@@ -57,5 +57,24 @@ Choose the appropriate iteration method based on data size, intent, and readabil
 ## 5. Asynchronous Code
 
 ### Rule
+
 - Prefer `async/await` for handling asynchronous operations to improve readability and maintainability. Use `try/catch` blocks for error handling in asynchronous code.
 - Use Promise patterns when running operations in parallel or handling multiple asynchronous operations that do not depend on each other.
+
+## 6. Object and Array Assignment
+
+### Rule
+
+When assigning objects or arrays that may be modified independently, create a new instance instead of sharing references.
+
+### Preferred
+```js
+const newObject = { ...oldObject };
+const newArray = [...oldArray];
+```
+
+### Avoid
+```js
+const newObject = oldObject;
+const newArray = oldArray;
+```
