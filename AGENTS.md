@@ -1,7 +1,5 @@
 # AGENTS.md
 
-> Be extremely concise. Sacrifice grammar for the sake of concision.
-
 ## Project Overview
 
 The Salesforce dev repository groups all Barco Salesforce configuration together.
@@ -26,11 +24,20 @@ The Salesforce dev repository groups all Barco Salesforce configuration together
 - Language-specific instruction files override general standards where applicable
 - Only apply language-specific rules when working in that language
 
+## Execution Constraints
+
+- Implement only what is explicitly requested or specified
+- Do not infer, extend, or generalize beyond requirement
+- Prefer simplest implementation that satisfies spec
+- Keep changes minimal and strictly scoped
+- Restructure only when required by the change
+- Do not alter unaffected logic, structure, or patterns
+
 ## Implementation Priority (follow in order)
 
 1. Modify an existing implementation if the business function is the same and only needs adaptation.
 2. Extend or overload an existing implementation only if the use case is identical and only the input shape differs.
-3. Create a new, clearly named implementation if the use case or input model differs.
+3. Create a new implementation if the use case or input model differs.
 
 Never introduce flags or additional parameters to reuse an implementation. This counts as a different use case. If unsure, create a new implementation instead of extending.
 
@@ -41,10 +48,11 @@ Never introduce flags or additional parameters to reuse an implementation. This 
 1. Keep a single source of truth: group business logic in one dedicated place at the highest appropriate abstraction level.
 2. Search for existing implementations in the most relevant locations (same module, domain, or layer).
 3. Keep changes minimal and scoped to the request.
+4. Always ask for permission before executing if system command are to be performed.
 
 ### DO NOT
 
-1. Do not run system commands (e.g. `sf force deploy`, delete operations, or similar) unless explicitly instructed to do so. Always ask for permission before executing if such commands are to be performed.
+1. Do not run system commands (e.g. `sf force deploy`, delete operations, or similar) unless explicitly instructed to do so.
 2. Do not commit or push directly to `main`.
 3. Do not store or share secrets.
 4. Generalize or merge different business cases into a single implementation.
@@ -54,9 +62,9 @@ Never introduce flags or additional parameters to reuse an implementation. This 
 ## Design Constraints
 
 - Method and component names must reflect a single, clear business intent.
+- Place business logic in the appropriate layer
+- Do not spread domain logic across utilities or low-level components.
 - Do not reuse generic or ambiguous names for different behaviors.
-- Place business logic in the appropriate layer; do not spread domain logic across utilities or low-level components.
-- These constraints are mandatory and must always be followed.
 
 ## Search Strategy
 
