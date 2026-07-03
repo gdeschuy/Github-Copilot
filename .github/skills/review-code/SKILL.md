@@ -1,5 +1,5 @@
 ---
-name: code-cleanup
+name: review-code
 description: Improves code maintainability by cleaning up messy code and removing duplication
 ---
 

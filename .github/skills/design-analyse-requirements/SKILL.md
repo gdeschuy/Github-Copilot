@@ -1,5 +1,5 @@
 ---
-name: grill-me
+name: design-analyse-requirements
 description: Interview the user relentlessly about a plan or design until reaching shared understanding. Use when user wants to stress-test a plan or design.
 ---
 
