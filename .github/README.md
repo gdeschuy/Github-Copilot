@@ -94,5 +94,4 @@ The underlying cross-platform scripting workers that execute heavy computing, pi
 To transform this powerful pipeline into a truly autonomous, self-directing AI agent ecosystem, the following capabilities should be integrated next:
 
 1. **Dynamic Schema-Drift Detection**: Automatic detection of custom field changes or API version upgrades in Salesforce to trigger on-demand rebuilds of the reference model JSON files.
-2. **Automated Rollback and State Recovery**: If a bulk data deployment fails mid-sequence, the graph database should automatically calculate a reverse-DML script to purge partially committed child records.
-3. **Graph-Augmented Code Generation (True GraphRAG)**: Injecting structural relationship contexts directly into code generation prompts to ensure new Apex classes automatically respect existing architecture, utility classes, and framework design patterns.
+2. **Graph-Augmented Code Generation (True GraphRAG)**: Injecting structural relationship contexts directly into code generation prompts to ensure new Apex classes automatically respect existing architecture, utility classes, and framework design patterns.
