@@ -1,5 +1,5 @@
 ---
-name: execute-generate-apex
+name: build-generate-apex
 description: "Expert Salesforce Apex development skill used to design, generate, refactor, optimize, and review Apex code. Use for Apex classes, triggers, trigger frameworks, asynchronous processing, integrations, REST services, business logic implementation, code reviews, and unit testing. Produces production-ready, bulkified, secure, and maintainable Apex solutions following Salesforce best practices and enterprise architecture patterns."
 ---
 

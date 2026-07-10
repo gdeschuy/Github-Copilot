@@ -1,5 +1,5 @@
 ---
-name: design-sf-architecture
+name: build-sf-architecture
 description: "Salesforce architecture and design standards for building scalable and maintainable solutions. Use this skill when planning and designing Salesforce solutions to ensure they adhere to best practices and architectural principles."
 ---
 # Design and Architecture Standards
