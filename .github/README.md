@@ -4,43 +4,43 @@
 
 The framework is structured into seven decoupled operational stages, driven by a specialized library of AI Skills and automation utilities.
 
-### 1. 📅 PLAN
-Defines the technical scope, business boundaries, and operational constraints before any code orchestration begins.
+### 1. 💬 DISCOVER
+Acts as the conversational interaction layer, listening to the user to extract, clarify, and align on requirements before downstream processing begins.
 
 #### Skills in this Section
 
 | Skill Name | One-Line Description |
 | :--- | :--- |
-| `plan-get-requirements` | Extracts structured user stories, functional parameters, and acceptance criteria from raw text prompts. |
+| `discover-get-requirements` | Engages in a clarifying dialogue to extract structured user stories, functional parameters, and acceptance criteria from raw text prompts. |
 
-* **Explanation**: This stage acts as the intake gate. It ensures the AI fully understands the user's intent, the functional scope, and the architectural rules before triggering downstream data or code discovery workflows.
+* **Explanation**: This stage acts as the interactive intake gate. Instead of jumping straight into code or data, the AI acts as a conversational partner. It probes the user's intent, resolves ambiguities, and establishes the functional scope and business boundaries before any analytical or design workflows are triggered.
 
 ---
 
-### 2. 🧠 ANALYSE
-The core intelligence and discovery layer that interprets domain models and maps target structures.
+### 2. 🔍 ANALYSE
+The discovery and inventory layer that maps the existing Salesforce setup to understand what is already available.
 
 #### Skills in this Section
 
 | Skill Name | One-Line Description |
 | :--- | :--- |
-| `analyse-sf-metadata` | Orchestrates the recursive parsing loop of the codebase and parses Salesforce metadata based on reference schemas. |
-| `analyse-sf-data` | Navigates multi-domain data relationships (Sales, CPQ, RLM, FSL) and crawls record lineages. |
+| `analyse-sf-metadata` | Scans and dissects the existing codebase to inventory the current metadata structure and active configurations. |
+| `analyse-sf-data` | Maps existing multi-domain data relationships (Sales, CPQ, RLM, FSL) and crawls record lineages to understand the live situation. |
 
-* **Explanation**: The brain of the operation. These skills read your centralized configuration models (`references/*.json`) to dynamically guide workers to the correct file extensions, directories, and abstract classifications.
+* **Explanation**: This stage acts as an X-ray of the current environment. Before any new solution is designed, these skills read the centralized configuration models (`references/*.json`) to dynamically guide workers through existing directories, file extensions, and data paths. The output is a crystal-clear picture of the current technical status quo.
 
 ---
 
 ### 3. 🗺️ DESIGN
-Translates analytical discoveries into highly performant system architectures and technical blueprints.
+Translates analytical discoveries into a concrete technical blueprint, working out the optimal solution architecture before implementation begins.
 
 #### Skills in this Section
 
 | Skill Name | One-Line Description |
 | :--- | :--- |
-| `design-sf-architecture` | Enforces the 'Core-First' paradigm by evaluating requirements against configuration, low-code, AI, and pro-code to select the architecture with the least customization effort. |
+| `design-sf-architecture` | Synthesizes requirements and metadata insights to architect the new solution topology, selecting the path of least customization (Configuration vs. Pro-Code). |
 
-* **Explanation**: This layer bridges analysis and execution. It uses the gathered repository insights to model optimal code topologies and data relationships before a single line of code is compiled.
+* **Explanation**: This layer bridges analysis and execution. It uses the gathered repository insights to actively model new code topologies, data relationships, and framework patterns, producing an exact architectural blueprint before a single line of code is authored.
 
 ---
 
@@ -51,9 +51,9 @@ The build and generation engine that handles automated code authorship, template
 
 | Skill Name | One-Line Description |
 | :--- | :--- |
-| `execute-generate-apex` | Authors highly optimized, pattern-compliant Apex classes, triggers, and unit tests using method-level context. |
-| `execute-generate-prompt` | Compiles advanced LLM prompt layouts, automatically embedding dynamic tokens and live data providers. |
-| `execute-sf-data-load` | Extracts cloud datasets as local CSVs and executes dependency-aware, sequenced bulk cloud deployments. |
+| `build-generate-apex` | Authors highly optimized, pattern-compliant Apex classes, triggers, and unit tests using method-level context. |
+| `build-generate-prompt` | Compiles advanced LLM prompt layouts, automatically embedding dynamic tokens and live data providers. |
+| `build-sf-data-load` | Extracts cloud datasets as local CSVs and executes dependency-aware, sequenced bulk cloud deployments. |
 
 * **Explanation**: The proactive build layer. These skills automate the creation of assets—writing code, composing system prompts, or staging records sequentially based on calculated graph dependencies and local validations.
 
