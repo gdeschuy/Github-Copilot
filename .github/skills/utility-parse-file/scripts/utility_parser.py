@@ -1,44 +1,86 @@
 import sys
 import json
+from pathlib import Path
 from json_parser import JsonParser
 from xml_parser import XmlParser
 from tree_sitter_parser import TreeSitterCodeParser
 
 
-def execute_utility_parser(parser_type: str, file_path: str):
+class UtilityParseWrapper:
     """
-    Orchestrates individual parser nodes and guarantees clean stdout returns.
+    Orchestration wrapper that loads dynamic metadata rules from the central config
+    and injects them directly into the designated parser instances.
     """
-    try:
-        if parser_type == "json":
-            parser = JsonParser()
-        elif parser_type == "xml":
-            parser = XmlParser()
-        elif parser_type == "tree-sitter":
-            parser = TreeSitterCodeParser()
-        else:
-            raise ValueError(f"Unknown parser type requested: {parser_type}")
 
-        # Run parser execution
-        output_data = parser.parse(file_path)
-        
-        # Stream structured JSON result directly back to utility router stdout
-        print(json.dumps(output_data, indent=2, ensure_ascii=False))
+    def __init__(self, config_path: str = "references/metadata-model.json"):
+        self.config_path = Path(config_path)
+        self.config_rules = self._load_config_rules()
 
-    except Exception as e:
-        error_payload = {
-            "file": file_path,
-            "parserType": parser_type,
-            "error": str(e)
-        }
-        print(json.dumps(error_payload, indent=2), file=sys.stderr)
-        sys.exit(1)
+    def _load_config_rules(self) -> dict:
+        """Loads and indexes the rules array from the metadata model file."""
+        if not self.config_path.exists():
+            return {}
+        try:
+            with open(self.config_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                # Map de regels op basis van fileType ("code", "xml", "json") voor snelle lookup
+                return {item.get("fileType"): item for item in data.get("salesforceMetadata", [])}
+        except (json.JSONDecodeError, IOError):
+            return {}
+
+    def execute(self, file_type: str, file_path: str):
+        """
+        Instantiates the correct parser node with its matching config rules 
+        and streams the result straight to stdout.
+        """
+        # Haal de specifieke consumes/provides regels op voor dit bestandstype
+        matched_rule = self.config_rules.get(file_type, {})
+
+        try:
+            if file_type == "code":
+                # Bepaal de tree-sitter language (bijv. 'java' voor Apex) op basis van de extensie
+                ext = Path(file_path).suffix.lower()
+                lang = "javascript" if ext == ".js" else "java"
+                
+                # Injecteer de dynamische rules direct in de zojuist gemaakte TreeSitter parser
+                parser = TreeSitterCodeParser(language_name=lang, rules=matched_rule)
+                
+            elif file_type == "xml":
+                parser = XmlParser(rules=matched_rule)
+
+            elif file_type == "json":
+                parser = JsonParser(rules=matched_rule)
+                
+            else:
+                raise ValueError(f"Unknown abstract file type requested: {file_type}")
+
+            # Voer de parser uit
+            output_data = parser.parse(file_path)
+            
+            # Voeg de metadataType context toe aan de output payload voor de graph reducer
+            output_data["metadataType"] = matched_rule.get("type", "Unknown")
+
+            # Stream het gestructureerde resultaat direct naar stdout
+            print(json.dumps(output_data, indent=2, ensure_ascii=False))
+
+        except Exception as e:
+            error_payload = {
+                "file": file_path,
+                "fileType": file_type,
+                "error": str(e)
+            }
+            print(json.dumps(error_payload, indent=2), file=sys.stderr)
+            sys.exit(1)
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python utility_parse.py <parser_type> <file_path>")
+        print("Usage: python utility_parse.py <file_type> <file_path>")
         sys.exit(1)
 
-    # Arguments injected dynamically via router skill execution context
-    execute_utility_parser(sys.argv[1], sys.argv[2])
+    # CLI arguments injected via the concurrent request router pipeline
+    requested_type = sys.argv[1]
+    requested_path = sys.argv[2]
+
+    wrapper = UtilityParseWrapper()
+    wrapper.execute(requested_type, requested_path)
