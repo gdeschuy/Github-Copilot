@@ -2,45 +2,119 @@
     "sourceRoot": "force-app/main/default",
     "salesforceMetadata": [
         {
-            "type": "AuraComponentBundle",
-            "description": "Aura component bundle for Lightning Experience, Experience Cloud and Visualforce integration",
-            "directory": "aura",
-            "extension": ".cmp",
+            "type": "AiAuthoringBundle",
+            "description": "Agent Script bundle defining an Agentforce agent and its associated metadata",
+            "directory": "aiAuthoringBundles",
+            "extension": ".agent",
             "hasMetaFile": true,
             "isBundle": true,
-            "naming": "{component_name}/{component_name}.cmp",
+            "naming": "{bundle_name}/{bundle_name}.agent",
             "consumes": [
                 {
-                    "targetType": "ApexClass",
-                    "relationship": "AuraEnabled",
-                    "pattern": "@AuraEnabled"
+                    "targetType": "Bot",
+                    "relationship": "targetAgent"
                 },
                 {
-                    "targetType": "LightningComponentBundle",
-                    "relationship": "LwcDependency",
-                    "pattern": "c:{componentName}"
+                    "targetType": "BotVersion",
+                    "relationship": "targetAgentVersion"
                 },
                 {
-                    "targetType": "AuraComponentBundle",
-                    "relationship": "AuraDependency",
-                    "pattern": "c:{componentName}"
+                    "targetType": "GenAiPlannerBundle",
+                    "relationship": "planner"
+                },
+                {
+                    "targetType": "GenAiPlugin",
+                    "relationship": "topic"
+                },
+                {
+                    "targetType": "GenAiFunction",
+                    "relationship": "action"
+                },
+                {
+                    "targetType": "GenAiPromptTemplate",
+                    "relationship": "promptTemplate"
                 },
                 {
                     "targetType": "Flow",
-                    "relationship": "FlowEmbedding",
-                    "pattern": "lightning:flow"
+                    "relationship": "invocationTarget"
+                },
+                {
+                    "targetType": "ApexClass",
+                    "relationship": "invocationTarget"
                 }
             ],
             "provides": [
                 {
-                    "relationship": "AuraEnabledComponent"
+                    "relationship": "AgentDefinition"
+                }
+            ]
+        },
+        {
+            "type": "AuraComponentBundle",
+            "description": "Aura component bundle for Lightning Experience, Experience Cloud and Visualforce integration",
+            "directory": "aura",
+            "isBundle": true,
+            "files": [
+                {
+                    "extension": ".cmp",
+                    "fileType": "xml",
+                    "consumes": [
+                        {
+                            "targetType": "LightningComponentBundle",
+                            "relationship": "LwcDependency",
+                            "pattern": "c:(?P<target>\\w+)"
+                        },
+                        {
+                            "targetType": "AuraComponentBundle",
+                            "relationship": "AuraDependency",
+                            "pattern": "c:(?P<target>\\w+)"
+                        },
+                        {
+                            "targetType": "Flow",
+                            "relationship": "FlowEmbedding",
+                            "pattern": "lightning:flow"
+                        }
+                    ],
+                    "provides": [
+                        {
+                            "relationship": "AuraEnabledComponent"
+                        },
+                        {
+                            "relationship": "LwcContainer"
+                        }
+                    ]
                 },
+                {
+                    "extension": "Controller.js",
+                    "fileType": "code",
+                    "consumes": [
+                        {
+                            "targetType": "ApexClass",
+                            "relationship": "AuraEnabledMethodCall",
+                            "pattern": "c\\.(?P<target>\\w+)"
+                        }
+                    ]
+                },
+                {
+                    "extension": "Helper.js",
+                    "fileType": "code",
+                    "consumes": [
+                        {
+                            "targetType": "ApexClass",
+                            "relationship": "AuraEnabledMethodCall",
+                            "pattern": "c\\.(?P<target>\\w+)"
+                        }
+                    ]
+                },
+                {
+                    "extension": ".js-meta.xml",
+                    "fileType": "xml"
+                }
+            ],
+            "provides": [
                 {
                     "relationship": "VisualforceEmbedding",
-                    "pattern": "$Lightning.use"
-                },
-                {
-                    "relationship": "LwcContainer"
+                    "pattern": "\\$Lightning\\.use"
                 }
             ]
         },
@@ -132,6 +206,7 @@
             "description": "Visualforce UI page",
             "directory": "pages",
             "extension": ".page",
+            "fileType": "xml",
             "hasMetaFile": true,
             "naming": "{page_name}.page",
             "consumes": [
@@ -158,6 +233,7 @@
             "description": "Database DML automation trigger",
             "directory": "triggers",
             "extension": ".trigger",
+            "fileType": "text",
             "hasMetaFile": true,
             "naming": "{trigger_name}.trigger",
             "consumes": [
@@ -173,6 +249,7 @@
             "description": "Top-level Agentforce Agent runtime",
             "directory": "bots",
             "extension": ".bot-meta.xml",
+            "fileType": "xml",
             "naming": "{bot_name}.bot-meta.xml"
         },
         {
@@ -180,6 +257,7 @@
             "description": "Versioned Agent runtime config",
             "directory": "bots",
             "extension": ".botVersion-meta.xml",
+            "fileType": "xml",
             "naming": "{bot_name}.{version_number}.botVersion-meta.xml",
             "parentType": "Bot"
         },
@@ -188,6 +266,7 @@
             "description": "Automation, orchestration, agent action, and prompt data provider",
             "directory": "flows",
             "extension": ".flow-meta.xml",
+            "fileType": "xml",
             "naming": "{flow_name}.flow-meta.xml",
             "consumes": [
                 {
@@ -230,6 +309,7 @@
             "description": "Agent Action invoking Apex, Flows, or Prompts",
             "directory": "genAiFunctions",
             "extension": ".genAiFunction-meta.xml",
+            "fileType": "xml",
             "naming": "{function_name}.genAiFunction-meta.xml",
             "parentType": "GenAiPlugin",
             "consumes": [
@@ -260,6 +340,7 @@
             "description": "Orchestration brain linking Functions and Plugins",
             "directory": "genAiPlannerBundles",
             "extension": ".genAiPlannerBundle-meta.xml",
+            "fileType": "xml",
             "parentType": "BotVersion"
         },
         {
@@ -267,6 +348,7 @@
             "description": "Subagent or topic conversation scope",
             "directory": "genAiPlugins",
             "extension": ".genAiPlugin-meta.xml",
+            "fileType": "xml",
             "parentType": "GenAiPlannerBundle"
         },
         {
@@ -274,6 +356,7 @@
             "description": "Reusable AI prompt layout via Prompt Builder",
             "directory": "genAiPromptTemplates",
             "extension": ".genAiPromptTemplate-meta.xml",
+            "fileType": "xml",
             "naming": "{prompt_name}.genAiPromptTemplate-meta.xml",
             "consumes": [
                 {
@@ -290,81 +373,28 @@
             "type": "LightningComponentBundle",
             "description": "LWC UI layout rendering bundle",
             "directory": "lwc",
-            "extension": ".js",
-            "hasMetaFile": true,
             "isBundle": true,
-            "naming": "{component_name}/{component_name}.js",
-            "consumes": [
+            "files": [
                 {
-                    "targetType": "ApexClass",
-                    "relationship": "AuraEnabled",
-                    "pattern": "@salesforce/apex/{className}.{methodName}"
-                }
-            ]
-        },
-        {
-            "type": "LightningTypeBundle",
-            "description": "Custom JSON schema for Agentforce parameters",
-            "directory": "lightningTypeBundles",
-            "extension": ".json",
-            "hasMetaFile": true,
-            "isBundle": true,
-            "naming": "{bundle_name}/{bundle_name}.schema.json",
-            "consumes": [
-                {
-                    "targetType": "LightningComponentBundle",
-                    "relationship": "uiMapping",
-                    "pattern": "editor.json"
-                }
-            ]
-        },
-        {
-            "type": "AiAuthoringBundle",
-            "description": "Agent Script bundle defining an Agentforce agent and its associated metadata",
-            "directory": "aiAuthoringBundles",
-            "extension": ".agent",
-            "hasMetaFile": true,
-            "isBundle": true,
-            "naming": "{bundle_name}/{bundle_name}.agent",
-            "consumes": [
-                {
-                    "targetType": "Bot",
-                    "relationship": "targetAgent"
+                    "extension": ".js",
+                    "fileType": "code",
+                    "consumes": [
+                        {
+                            "targetType": "ApexClass",
+                            "relationship": "apexMethodImport",
+                            "pattern": "@salesforce/apex/(?P<target>\\w+)\\.\\w+"
+                        }
+                    ]
                 },
                 {
-                    "targetType": "BotVersion",
-                    "relationship": "targetAgentVersion"
+                    "extension": ".html",
+                    "fileType": "xml"
                 },
                 {
-                    "targetType": "GenAiPlannerBundle",
-                    "relationship": "planner"
-                },
-                {
-                    "targetType": "GenAiPlugin",
-                    "relationship": "topic"
-                },
-                {
-                    "targetType": "GenAiFunction",
-                    "relationship": "action"
-                },
-                {
-                    "targetType": "GenAiPromptTemplate",
-                    "relationship": "promptTemplate"
-                },
-                {
-                    "targetType": "Flow",
-                    "relationship": "invocationTarget"
-                },
-                {
-                    "targetType": "ApexClass",
-                    "relationship": "invocationTarget"
-                }
-            ],
-            "provides": [
-                {
-                    "relationship": "AgentDefinition"
+                    "extension": ".css",
+                    "fileType": "xml"
                 }
             ]
         }
-  ]
+    ]
 }
