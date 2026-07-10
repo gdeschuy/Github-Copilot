@@ -38,7 +38,7 @@ Translates analytical discoveries into highly performant system architectures an
 
 | Skill Name | One-Line Description |
 | :--- | :--- |
-| `design-sf-architecture` | Generates enterprise-grade technical designs, entity-relationship diagrams (ERDs), and class structure layouts. |
+| `design-sf-architecture` | Enforces the 'Core-First' paradigm by evaluating requirements against configuration, low-code, AI, and pro-code to select the architecture with the least customization effort. |
 
 * **Explanation**: This layer bridges analysis and execution. It uses the gathered repository insights to model optimal code topologies and data relationships before a single line of code is compiled.
 
