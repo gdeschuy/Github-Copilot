@@ -1,5 +1,5 @@
 ---
-name: generate-prompt
+name: execute-generate-prompt
 description: "Enterprise Prompt Generation Framework. Creates production-grade prompts, system prompts, agent instructions, workflows, and SKILL.md specifications using prompt engineering, determinism, governance, and safety best practices."
 ---
 
