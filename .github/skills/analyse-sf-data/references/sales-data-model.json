@@ -6,6 +6,7 @@
             "sourceFile": "data/accounts.csv",
             "fileType": "csv",
             "primaryKey": "Id",
+            "externalIdField": "ExternalId__c",
             "relationships": [
                 {
                     "type": "Child",
