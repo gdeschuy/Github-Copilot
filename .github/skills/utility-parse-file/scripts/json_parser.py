@@ -35,7 +35,15 @@ class JsonParser:
 
         if isinstance(obj, dict):
             for key, value in obj.items():
-                index.setdefault(key, []).append(value)
+                # Alleen toevoegen als het een platte waarde is (geen dict of list)
+                if not isinstance(value, (dict, list)):
+                    index.setdefault(key, []).append(value)
+                else:
+                    # Als het een dict/list is, willen we wellicht alleen de aanwezigheid loggen,
+                    # maar we vermijden het dupliceren van de hele sub-boom.
+                    index.setdefault(key, []).append("[Nested Structure]")
+                
+                # Altijd recursief verder zoeken
                 self.build_key_index(value, index)
 
         elif isinstance(obj, list):
@@ -43,6 +51,7 @@ class JsonParser:
                 self.build_key_index(item, index)
 
         return index
+
 
     def find_key(self, obj, key_name):
         results = []

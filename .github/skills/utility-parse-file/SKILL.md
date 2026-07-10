@@ -1,178 +1,56 @@
 ---
-name: plan-parse-file
-description: Generic repository analysis engine that uses XML, JSON and Tree-sitter code parsers to generate a repository knowledge graph for downstream AI skills.
+name: utility-parse-file
+description: A low-level framework utility skill that parses files based on their type and outputs a normalized structure. Use when you need to extract structured data from various file formats.
 ---
 
-# Repository Analysis Engine
+# Utility Parse Skill
 
-You are a repository analysis engine.
+## Description
+A low-level framework utility skill that acts as a deterministic worker. It takes a file and an abstract file type specification directly from an orchestrator skill, routes the file to the correct internal parsing engine, and dumps the normalized structure to standard output (`stdout`).
 
-Your responsibility is to generate a normalized repository knowledge graph.
+## Capabilities
+- **Blind Routing**: Does not contain any domain or Salesforce-specific knowledge. It relies entirely on the parameters provided by the calling orchestrator.
+- **AST & Dynamic Extraction**: Automatically extracts structural code hooks (`extends`, `implements`, `new` instantiations) when executed with the `code` type.
+- **Streaming Output**: Guarantees a clean JSON object returned via `stdout`, allowing concurrent request routers to capture the stream in-memory without disk contention.
 
-You do not perform architecture reasoning, code reviews, dependency explanations, documentation generation, or impact analysis. Your responsibility is limited to repository parsing and graph generation.
+## Usage Schema (CLI Command)
+To execute a parse job, pass the abstract `file_type` and the relative `file_path` exactly as dictated by the orchestrator skill:
 
-## Available Components
-
-### Parsers
-
-- xml_parser.py
-- json_parser.py
-- treesitter_code_parser.py
-
-### Orchestrator
-
-- scanner.py
-
-### Graph Builder
-
-- repository_graph_builder.py
-
-## Workflow
-
-### Step 1 - Load Metadata Configuration
-
-Load:
-
-```text
-metadata-model.json
+```powershell
+python scripts\utility_parse.py <file_type> <file_path>
 ```
 
-The metadata model is the source of truth.
-
-Use the parser configured on each metadata type.
-
-Example:
-
-```json
-{
-  "type": "Flow",
-  "parser": "xml"
-}
+```bash
+python scripts/utility_parse.py <file_type> <file_path>
 ```
 
-```json
-{
-  "type": "ApexClass",
-  "parser": "code"
-}
+### Supported File Types
+* `code` -> Activates the Tree-Sitter AST parser engine.
+* `xml` -> Activates the normalized XML element parser engine.
+* `json` -> Activates the flattened key-indexing JSON parser engine.
+
+### Examples
+
+**1. Executing a Code Parse Task**
+
+```powershell
+python scripts\utility_parse.py "code" "force-app\main\default\classes\AccountService.cls"
 ```
 
-```json
-{
-  "type": "LightningTypeBundle",
-  "parser": "json"
-}
+```bash
+python scripts/utility_parse.py "code" "force-app/main/default/classes/AccountService.cls"
 ```
 
-### Step 2 - Execute Repository Scan
-
-Run:
-
-```python
-scanner.py
+**2. Executing an XML Parse Task**
+```powershell
+python scripts\utility_parse.py "xml" "force-app\main\default\objects\Account.object"
 ```
 
-The scanner must:
-
-- Discover repository files
-- Select the configured parser
-- Parse each file
-- Return normalized document objects
-
-The scanner must not create dependencies.
-
-### Step 3 - Extract Repository Relationships
-
-Using the metadata model:
-
-- Read consumes relationships
-- Read provides relationships
-- Build nodes
-- Build edges
-
-Resolve relationships from parsed document output.
-
-Never scan raw files when equivalent parser output already exists.
-
-### Step 4 - Build Knowledge Graph
-
-Run:
-
-```python
-repository_graph_builder.py
+```bash
+python scripts/utility_parse.py "xml" "force-app/main/default/objects/Account.object"
 ```
 
-Generate:
-
-```json
-{
-  "metadata": {},
-  "statistics": {},
-  "nodes": {},
-  "edges": [],
-  "cycles": [],
-  "orphans": []
-}
-```
-
-### Step 5 - Return Graph
-
-Return only the generated knowledge graph.
-
-Do not return:
-
-- Raw source files
-- Large XML files
-- Apex code
-- JavaScript code
-
-unless explicitly requested.
-
-## Graph Requirements
-
-Each node should contain:
-
-```json
-{
-  "type": "ApexClass",
-  "path": "classes/CaseService.cls",
-  "dependencies": [],
-  "usedBy": [],
-  "fanIn": 0,
-  "fanOut": 0,
-  "riskScore": 0
-}
-```
-
-## Output Priority
-
-1. Repository Knowledge Graph
-2. Statistics
-3. Cycles
-4. Orphans
-
-## Token Optimization Rules
-
-- Always use parser output instead of source code.
-- Never load entire repositories into context.
-- Never perform duplicate parsing.
-- Always use the generated graph as the primary output.
-- Keep results machine-readable.
-
-## Source of Truth
-
-Authoritative order:
-
-```text
-metadata-model.json
-↓
-scanner.py
-↓
-xml/json/code parsers
-↓
-repository_graph_builder.py
-↓
-repository knowledge graph
-```
-
-Everything downstream should consume the generated graph rather than the repository itself.
+## Agent Execution Instructions
+1. **Receive Parameters**: Do not attempt to guess or discover the file type from the repository structure. Wait for the `analyse-sf-metadata` skill to provide the exact `file_type`.
+2. **Execute Command**: Construct the CLI command using the provided `<file_type>` and `<file_path>`.
+3. **Pipe Output**: Capture the standard output (`stdout`) stream and immediately hand it over to the next pipeline skill (`utility-graph-output`) for graph integration.
