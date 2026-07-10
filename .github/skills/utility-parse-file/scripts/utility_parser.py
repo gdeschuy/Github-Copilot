@@ -1,9 +1,10 @@
 import sys
 import json
 from pathlib import Path
+from csv_parser import CsvParser
 from json_parser import JsonParser
-from xml_parser import XmlParser
 from tree_sitter_parser import TreeSitterCodeParser
+from xml_parser import XmlParser
 
 
 class UtilityParseWrapper:
@@ -69,6 +70,9 @@ class UtilityParseWrapper:
                 lang = "javascript" if ext == ".js" else "java"
                 parser = TreeSitterCodeParser(language_name=lang, rules=matched_rule)
                 
+            elif actual_file_type == "csv":
+                parser = CsvParser(rules=matched_rule)
+
             elif actual_file_type == "xml":
                 parser = XmlParser(rules=matched_rule)
 

@@ -1,0 +1,97 @@
+{
+    "salesforceDataModel": [
+        {
+            "object": "Case",
+            "description": "Core Service Cloud Support Case tracking customer issues, inquiries, and technical complaints",
+            "sourceFile": "data/service_cases.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "Account",
+                    "lookupField": "AccountId",
+                    "description": "The customer account associated with this support ticket"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "Contact",
+                    "lookupField": "ContactId",
+                    "description": "The specific individual or requester who opened the case"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "Case",
+                    "lookupField": "ParentId",
+                    "description": "Parent Case ID if this ticket is part of a larger technical incident or master ticket"
+                },
+                {
+                    "type": "Child",
+                    "targetObject": "CaseTeamMember",
+                    "lookupField": "ParentId",
+                    "description": "Internal users or partners assigned to help resolve this specific case"
+                },
+                {
+                    "type": "Child",
+                    "targetObject": "Swarm",
+                    "lookupField": "RelatedRecordId",
+                    "description": "Slack or internal swarming sessions opened to resolve complex technical blockages"
+                }
+            ]
+        },
+        {
+            "object": "CaseTeamMember",
+            "description": "Junction record representing team assignment and access roles on a specific Case",
+            "sourceFile": "data/service_case_team_members.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "Case",
+                    "lookupField": "ParentId",
+                    "description": "The case this team member is assigned to"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "User",
+                    "lookupField": "MemberId",
+                    "description": "The internal user or technician executing work on the case"
+                }
+            ]
+        },
+        {
+            "object": "Knowledge__kav",
+            "description": "Service Cloud Knowledge Article Version containing solutions, documentation, and troubleshooting guides",
+            "sourceFile": "data/service_knowledge.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "User",
+                    "lookupField": "CreatedById",
+                    "description": "The author who compiled or updated this specific article state"
+                }
+            ],
+            "consumes": [
+                {
+                    "targetType": "Product2",
+                    "relationship": "ProductRelevance",
+                    "pattern": "<dataCategoryName>(?P<target>\\w+)</dataCategoryName>"
+                }
+            ]
+        },
+        {
+            "object": "Swarm",
+            "description": "Incident Management Swarm record orchestrating tier-3 support acceleration groups",
+            "sourceFile": "data/service_swarms.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "Case",
+                    "lookupField": "RelatedRecordId",
+                    "description": "The source service case that triggered the swarm invocation"
+                }
+            ]
+        }
+    ]
+}

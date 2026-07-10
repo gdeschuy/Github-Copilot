@@ -1,0 +1,83 @@
+{
+    "salesforceDataModel": [
+        {
+            "object": "WorkOrder",
+            "description": "Represents the specific service or repair work to be performed for a customer",
+            "sourceFile": "data/fsl_work_orders.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "Account",
+                    "lookupField": "AccountId",
+                    "description": "The customer account associated with the service work"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "Case",
+                    "lookupField": "CaseId",
+                    "description": "The support case in the Service domain that triggered this work order"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "Asset",
+                    "lookupField": "AssetId",
+                    "description": "The specific physical equipment or subscription asset being serviced"
+                },
+                {
+                    "type": "Child",
+                    "targetObject": "ServiceAppointment",
+                    "lookupField": "ParentRecordId",
+                    "description": "The actual scheduled time slots mapped to this work order"
+                }
+            ]
+        },
+        {
+            "object": "ServiceAppointment",
+            "description": "Represents the specific scheduled window, arrival tracking, and status of the field visit",
+            "sourceFile": "data/fsl_service_appointments.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "WorkOrder",
+                    "lookupField": "ParentRecordId",
+                    "description": "The parent work order providing the task details"
+                },
+                {
+                    "type": "Child",
+                    "targetObject": "AssignedResource",
+                    "lookupField": "ServiceAppointmentId",
+                    "description": "The specific mobile technician assigned to handle this appointment"
+                }
+            ]
+        },
+        {
+        "object": "AssignedResource",
+        "description": "Junction record linking a scheduled appointment to a specific field technician or service resource",
+        "sourceFile": "data/fsl_assigned_resources.json",
+        "primaryKey": "Id",
+        "relationships": [
+            {
+                "type": "Parent",
+                "targetObject": "ServiceAppointment",
+                "lookupField": "ServiceAppointmentId",
+                "description": "The appointment slot being fulfilled"
+            },
+            {
+                "type": "Parent",
+                "targetObject": "ServiceResource",
+                "lookupField": "ServiceResourceId",
+                "description": "The specific field technician or equipment resource dispatched"
+            }
+        ]
+        },
+        {
+            "object": "ServiceResource",
+            "description": "Represents an individual mobile worker, service technician, or sub-contractor crew",
+            "sourceFile": "data/fsl_service_resources.json",
+            "primaryKey": "Id",
+            "relationships": []
+        }
+    ]
+}

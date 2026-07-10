@@ -1,0 +1,76 @@
+{
+    "salesforceDataModel": [
+        {
+            "object": "SBQQ__Quote__c",
+            "description": "Salesforce CPQ Quote Header storing pricing calculations and terms",
+            "sourceFile": "data/cpq_quotes.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "Opportunity",
+                    "lookupField": "SBQQ__Opportunity2__c",
+                    "description": "The core Sales Opportunity this CPQ quote belongs to"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "Account",
+                    "lookupField": "SBQQ__Account__c",
+                    "description": "The customer account linked to this quote"
+                },
+                {
+                    "type": "Child",
+                    "targetObject": "SBQQ__QuoteLine__c",
+                    "lookupField": "SBQQ__Quote__c",
+                    "description": "Individual line items calculated inside this quote bundle"
+                }
+            ]
+        },
+        {
+            "object": "SBQQ__QuoteLine__c",
+            "description": "CPQ Quote Line containing individual product pricing, discounts, and quantities",
+            "sourceFile": "data/cpq_quote_lines.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "SBQQ__Quote__c",
+                    "lookupField": "SBQQ__Quote__c",
+                    "description": "The parent quote header"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "Product2",
+                    "lookupField": "SBQQ__Product__c",
+                    "description": "The specific product record cataloged on this line"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "SBQQ__ProductOption__c",
+                    "lookupField": "SBQQ__ProductOption__c",
+                    "description": "The configuration option record if this line belongs to a product bundle"
+                }
+            ]
+        },
+        {
+            "object": "SBQQ__ProductOption__c",
+            "description": "CPQ Product Option linking features and bundled components within a Product featureset",
+            "sourceFile": "data/cpq_product_options.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "Product2",
+                    "lookupField": "SBQQ__ConfiguredSKU__c",
+                    "description": "The parent bundle/kit product that holds this option"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "Product2",
+                    "lookupField": "SBQQ__OptionalSKU__c",
+                    "description": "The component product that can be selected inside the bundle"
+                }
+            ]
+        }
+    ]
+}

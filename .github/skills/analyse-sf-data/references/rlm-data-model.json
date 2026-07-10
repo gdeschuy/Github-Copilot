@@ -1,0 +1,83 @@
+{
+    "salesforceDataModel": [
+        {
+            "object": "SalesOrder",
+            "description": "Core RLM Sales Order tracking the commercial transaction header",
+            "sourceFile": "data/rlm_orders.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "Account",
+                    "lookupField": "AccountId",
+                    "description": "The customer account purchasing the goods or services"
+                },
+                {
+                    "type": "Parent",
+                    "targetObject": "Quote",
+                    "lookupField": "QuoteId",
+                    "description": "The upstream native quote that generated this RLM order"
+                },
+                {
+                    "type": "Child",
+                    "targetObject": "SalesOrderProduct",
+                    "lookupField": "SalesOrderId",
+                    "description": "Individual line items and assets ordered within this transaction"
+                }
+            ]
+        },
+        {
+        "object": "SalesOrderProduct",
+        "description": "RLM Order Line Item containing calculated sales prices, quantities, and pricing procedure logs",
+        "sourceFile": "data/rlm_order_products.json",
+        "primaryKey": "Id",
+        "relationships": [
+            {
+                "type": "Parent",
+                "targetObject": "SalesOrder",
+                "lookupField": "SalesOrderId",
+                "description": "The parent RLM sales order header"
+            },
+            {
+                "type": "Parent",
+                "targetObject": "Product2",
+                "lookupField": "Product2Id",
+                "description": "The unified catalog product assigned to this line"
+            },
+            {
+                "type": "Parent",
+                "targetObject": "ProductSellingModel",
+                "lookupField": "ProductSellingModelId",
+                "description": "Defines if this line is a One-Time, Termed Subscription, or Evergreen Ever-recurring deal"
+            }
+        ]
+        },
+        {
+        "object": "Asset",
+        "description": "Lifecycle-managed asset tracking active customer subscriptions, renewals, and amendments",
+        "sourceFile": "data/rlm_assets.json",
+        "primaryKey": "Id",
+        "relationships": [
+            {
+                "type": "Parent",
+                "targetObject": "Account",
+                "lookupField": "AccountId",
+                "description": "The asset owner account used for renewal generation"
+            },
+            {
+                "type": "Parent",
+                "targetObject": "SalesOrderProduct",
+                "lookupField": "SalesOrderProductId",
+                "description": "The specific order transaction line that created or amended this asset state"
+            }
+        ]
+        },
+        {
+            "object": "ProductSellingModel",
+            "description": "RLM Pricing catalog model defining the monetization structure (Subscription vs One-Time)",
+            "sourceFile": "data/rlm_selling_models.json",
+            "primaryKey": "Id",
+            "relationships": []
+        }
+    ]
+}

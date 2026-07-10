@@ -38,23 +38,30 @@ echo '{"nodes": [], "edges": []}' > workspace_state.json
 4. Extract the abstract `fileType` (e.g., `code`) and the metadata `type` string (e.g., `ApexClass`).
 
 ### Step 2: Formulate & Fire the Pipeline
-Construct a chained shell command that routes the files through the parser and directly pipes the stream into the graph reducer. Run this concurrently via your router for all files in the current batch:
+Construct the parallel batch runner command, passing the discovered <fileType> and <type> variables directly into their respective flags. Run this concurrently for all files in the current batch:
+
+For Windows PowerShell:
 
 ```powershell
-python scripts\utility_parse.py "<fileType>" "<file_path>" | python scripts\utility_graph_output.py "workspace_state.json" "<type>"
+python scripts\generic_batch_runner.py --worker "python scripts\utility_parse.py" --reducer "python scripts\utility_graph_output.py" --type "<fileType>" --metadata "<type>" --items "<comma_separated_file_paths>" --state "workspace_state.json"
 ```
 
-```bash
-python scripts/utility_parse.py "<fileType>" "<file_path>" | python scripts/utility_graph_output.py "workspace_state.json" "<type>"
-```
+*Example command generated for AccountService (Windows):*
 
-*Example command generated for AccountService:*
 ```powershell
-python scripts\utility_parse.py "code" "force-app\main\default\classes\AccountService.cls" | python scripts\utility_graph_output.py "workspace_state.json" "ApexClass"
+python scripts\generic_batch_runner.py --worker "python scripts\utility_parse.py" --reducer "python scripts\utility_graph_output.py" --type "code" --metadata "ApexClass" --items "force-app\main\default\classes\AccountService.cls" --state "workspace_state.json"
 ```
 
+For Linux / macOS / Git Bash:
+
 ```bash
-python scripts/utility_parse.py "code" "force-app/main/default/classes/AccountService.cls" | python scripts/utility_graph_output.py "workspace_state.json" "ApexClass"
+python scripts/generic_batch_runner.py --worker "python scripts/utility_parse.py" --reducer "python scripts/utility_graph_output.py" --type "<fileType>" --metadata "<type>" --items "<comma_separated_file_paths>" --state "workspace_state.json"
+```
+
+*Example command generated for AccountService (Bash):*
+
+```bash
+python scripts/generic_batch_runner.py --worker "python scripts/utility_parse.py" --reducer "python scripts/utility_graph_output.py" --type "code" --metadata "ApexClass" --items "force-app/main/default/classes/AccountService.cls" --state "workspace_state.json"
 ```
 
 ### Step 3: Check the Unresolved Queue

@@ -1,0 +1,37 @@
+{
+    "salesforceDataModel": [
+        {
+            "object": "Account",
+            "description": "Bedrijven en organisaties",
+            "sourceFile": "data/accounts.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Child",
+                    "targetObject": "Contact",
+                    "lookupField": "AccountId",
+                    "description": "Personen die bij dit account horen"
+                },
+                {
+                    "type": "Child",
+                    "targetObject": "Opportunity",
+                    "lookupField": "AccountId",
+                    "description": "Verkooptrajecten voor dit account"
+                }
+            ]
+        },
+        {
+            "object": "Contact",
+            "description": "Individuele personen",
+            "sourceFile": "data/contacts.json",
+            "primaryKey": "Id",
+            "relationships": [
+                {
+                    "type": "Parent",
+                    "targetObject": "Account",
+                    "lookupField": "AccountId"
+                }
+            ]
+        }
+    ]
+}
