@@ -3,7 +3,8 @@
         {
             "object": "Account",
             "description": "Bedrijven en organisaties",
-            "sourceFile": "data/accounts.json",
+            "sourceFile": "data/accounts.csv",
+            "fileType": "csv",
             "primaryKey": "Id",
             "relationships": [
                 {

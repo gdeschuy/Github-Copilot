@@ -1,44 +1,69 @@
 ---
 name: execute-sf-data-load
-description: "A live data infrastructure skill. It enables the AI agent to execute high-speed SOQL queries directly against a live Salesforce environment and push data updates (inserts, updates, upserts) back to the cloud using the native Salesforce CLI (`sf`). It streams live cloud records straight into the graph pipeline via standard output (`stdout`)."
+description: "A live data infrastructure skill. It enables the AI agent to execute high-speed SOQL queries directly against a live Salesforce environment, export object-specific data into a local data directory as CSV files, and push data updates (inserts, updates, upserts) back to the cloud using the native Salesforce CLI (`sf`)."
 ---
 
 # Utility Salesforce Data Load Skill
 
-## Description
-
 ## Capabilities
-- **Live Cloud Extraction**: Bypasses local data file limits by querying live sandboxes or production environments in real-time.
-- **Unified Pipeline Piping**: Returns query data as standardized JSON objects via `stdout`, allowing immediate integration into `utility-graph-output`.
-- **Transactional Cloud Writing**: Supports both single-record patches and multi-core bulk inserts/updates using local JSON/CSV files.
+- **Live Cloud Extraction**: Queries real-time sandboxes or production environments via SOQL without local storage limitations.
+- **Automated CSV Dumping**: Exports targeted object datasets directly into dedicated files (e.g., `data/Account.csv`) using native CLI formatters, making them instantly available for the local `CsvParser` pipeline.
+- **Transactional Cloud Writing**: Pushes local architectural or data changes back to Salesforce via single-record updates or multi-core bulk operations.
 
 ## Usage Schema (Windows PowerShell & Bash Commands)
 
-### 1. Querying Live Data via SOQL (Piped straight into the Graph)
-To extract live records, construct a SOQL query, enforce the `--json` flag, and pipe it directly into the graph reducer:
+### 1. Extracting Live Data to Object-Specific CSV Files (For Offline Graph Analysis)
+To pull live records and store them for the local `analyse-sf-data` skill, execute a SOQL query using the CSV result format and redirect the output to the dedicated `data/` directory:
 
+#### PowerShell Environment (Windows)
 ```powershell
-sf data query --query "SELECT Id, Name, <lookup_field> FROM <SObject> WHERE <Condition>" --json | python scripts\utility_graph_output.py "workspace_state.json" "<SObject>"
+sf data query --query "SELECT Id, Name, AccountId FROM Contact WHERE CreatedDate = THIS_MONTH" --result-format csv | Out-File -FilePath "data\Contact.csv" -Encoding utf8
 ```
 
-*Example: Live query for CPQ Quote Lines on Windows:*
-```powershell
-sf data query --query "SELECT Id, Name, SBQQ__Quote__c, SBQQ__Product__c FROM SBQQ__QuoteLine__c WHERE SBQQ__Quote__c = 'a0Q8000000Eg123'" --json | python scripts\utility_graph_output.py "workspace_state.json" "SBQQ__QuoteLine__c"
+#### Bash Environment (Linux / macOS / Git Bash)
+```bash
+sf data query --query "SELECT Id, Name, AccountId FROM Contact WHERE CreatedDate = THIS_MONTH" --result-format csv > data/Contact.csv
 ```
 
-### 2. Updating Live Data using local JSON files
-To push architectural updates or data corrections back to Salesforce from a local JSON payload, trigger the bulk insertion worker:
+---
 
+### 2. Querying Live Data directly into the Graph (Streaming In-Memory)
+To pipe raw query data straight into the graph reducer without saving a local CSV file, force the `--json` flag:
+
+#### PowerShell Environment (Windows)
 ```powershell
-sf data record insert bulk --sobject <SObject> --file <local_file_path>
+sf data query --query "SELECT Id, Name, AccountId FROM Contact" --json | python scripts\utility_graph_output.py "workspace_state.json" "Contact"
 ```
 
-*Example: Pushing updated FSL Work Orders to Salesforce:*
-```powershell
-sf data record insert bulk --sobject WorkOrder --file data\fsl_work_orders.json
+#### Bash Environment (Linux / macOS / Git Bash)
+```bash
+sf data query --query "SELECT Id, Name, AccountId FROM Contact" --json | python scripts/utility_graph_output.py "workspace_state.json" "Contact"
 ```
+
+---
+
+### 3. Updating Live Data using local CSV files
+To push architectural updates or data corrections back to Salesforce from your local staging directory, trigger the bulk insertion worker:
+
+#### PowerShell Environment (Windows)
+```powershell
+sf data record insert bulk --sobject <SObject> --file "data\<SObject>.csv"
+```
+
+*Example: Pushing updated Accounts to Salesforce on Windows:*
+```powershell
+sf data record insert bulk --sobject Account --file data\Account.csv
+```
+
+#### Bash Environment (Linux / macOS / Git Bash)
+```bash
+sf data record insert bulk --sobject <SObject> --file data/<SObject>.csv
+```
+
+---
 
 ## Agent Execution Instructions
-1. **Identify Source Preference**: Check if the user prompt requires a "live cloud analysis" or a "local repository analysis".
-2. **Execute Extract Loop**: If live, use the **SOQL Query Command** above instead of `utility_parse.py`. Pipe the resulting live stream directly into `utility_graph_output.py`.
-3. **Execute Load Action**: If the user approves an architectural or data update, compile the required fields into a clean JSON/CSV format and execute the **Bulk Update Command** to sync the repository back to the Salesforce cloud.
+1. **Identify Strategy**: Determine if the task requires a live, in-memory graph stream (Use Schema 2) or a persistent local dump for continuous repository analysis (Use Schema 1).
+2. **Execute CSV Dump**: If persistent data mapping is required, locate the object name, construct the SOQL statement, and execute the **CSV Extraction Command** (Schema 1) targeting the `data\<SObject>.csv` file path.
+3. **Notify Orchestrator**: Once the CSV file is written to the disk, update the corresponding `references/*-data-model.json` configuration entry to match the new file target, and hand execution back to `analyse-sf-data` to crawl the local file.
+4. **Execute Cloud Sync**: If data modifications are verified and approved, use the **Bulk Data Command** (Schema 3) to upload the corrected data back to Salesforce.
