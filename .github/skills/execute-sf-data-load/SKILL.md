@@ -76,6 +76,11 @@ sf data record insert bulk --sobject <SObject> --file "data\<SObject>.csv"
 
 ## Agent Execution Instructions
 
+### Phase A: Data Extraction & Staging Loop
+1. **Identify Strategy**: Determine if the user prompt requires a real-time cloud analysis (Schema 2) or a persistent local download for sequential analysis.
+2. **Execute CSV Dump**: If persistent data mapping is needed, construct the SOQL statement and execute the **CSV Extraction Command** (Schema 1) targeting the matching path (e.g., `data\<SObject>.csv`).
+3. **Notify Orchestrator**: Once the file is written, pass control back to `analyse-sf-data` to crawl the local file.
+
 ### Phase B: Safe Data Deployment Loop (DML / Upload)
 1. **Trigger Order Calculator**: When instructed to load or sync data files back to Salesforce, execute the **Data Insertion Order Command** (Schema 2) to calculate the queue (`data-load-order.py`).
 2. **Evaluate Domain Config for Upsert**: For each object in the resulting queue, inspect its entry in the active domain configuration file (e.g., `references/cpq-data-model.json`):
