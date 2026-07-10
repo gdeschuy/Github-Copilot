@@ -1,5 +1,5 @@
 ---
-name: analyse-get-requirements
+name: plan-get-requirements
 description: Interview the user relentlessly about a plan or design until reaching shared understanding. Use when user wants to stress-test a plan or design.
 ---
 
