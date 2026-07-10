@@ -5,47 +5,57 @@
             "type": "AiAuthoringBundle",
             "description": "Agent Script bundle defining an Agentforce agent and its associated metadata",
             "directory": "aiAuthoringBundles",
-            "extension": ".agent",
-            "hasMetaFile": true,
             "isBundle": true,
-            "naming": "{bundle_name}/{bundle_name}.agent",
-            "consumes": [
+            "files": [
                 {
-                    "targetType": "Bot",
-                    "relationship": "targetAgent"
+                    "extension": ".agent",
+                    "fileType": "code",
+                    "consumes": [
+                        {
+                            "targetType": "Bot",
+                            "relationship": "targetAgent",
+                            "pattern": "agent_name\\s*=\\s*\"(?P<target>\\w+)\""
+                        },
+                        {
+                            "targetType": "GenAiPlannerBundle",
+                            "relationship": "planner",
+                            "pattern": "planner\\s*=\\s*(?P<target>\\w+)"
+                        },
+                        {
+                            "targetType": "GenAiPlugin",
+                            "relationship": "topic",
+                            "pattern": "topic\\s+(?P<target>\\w+)"
+                        },
+                        {
+                            "targetType": "GenAiFunction",
+                            "relationship": "action",
+                            "pattern": "action\\s+(?P<target>\\w+)"
+                        },
+                        {
+                            "targetType": "GenAiPromptTemplate",
+                            "relationship": "promptTemplate",
+                            "pattern": "prompt_template\\s*=\\s*(?P<target>\\w+)"
+                        },
+                        {
+                            "targetType": "Flow",
+                            "relationship": "invocationTarget",
+                            "pattern": "flow\\s*=\\s*(?P<target>\\w+)"
+                        },
+                        {
+                            "targetType": "ApexClass",
+                            "relationship": "invocationTarget",
+                            "pattern": "apex_class\\s*=\\s*(?P<target>\\w+)"
+                        }
+                    ],
+                    "provides": [
+                        {
+                            "relationship": "AgentDefinition"
+                        }
+                    ]
                 },
                 {
-                    "targetType": "BotVersion",
-                    "relationship": "targetAgentVersion"
-                },
-                {
-                    "targetType": "GenAiPlannerBundle",
-                    "relationship": "planner"
-                },
-                {
-                    "targetType": "GenAiPlugin",
-                    "relationship": "topic"
-                },
-                {
-                    "targetType": "GenAiFunction",
-                    "relationship": "action"
-                },
-                {
-                    "targetType": "GenAiPromptTemplate",
-                    "relationship": "promptTemplate"
-                },
-                {
-                    "targetType": "Flow",
-                    "relationship": "invocationTarget"
-                },
-                {
-                    "targetType": "ApexClass",
-                    "relationship": "invocationTarget"
-                }
-            ],
-            "provides": [
-                {
-                    "relationship": "AgentDefinition"
+                    "extension": ".bundle-meta.xml",
+                    "fileType": "xml"
                 }
             ]
         },
@@ -123,19 +133,19 @@
             "description": "Apex backend code/logic",
             "directory": "classes",
             "extension": ".cls",
-            "fileType": "text",
+            "fileType": "code",
             "hasMetaFile": true,
             "naming": "{class_name}.cls",
             "consumes": [
                 {
                     "targetType": "ApexClass",
                     "relationship": "staticMethodInvocation",
-                    "pattern": "{className}.{methodName}"
+                    "pattern": "(?P<target>\\w+)\\.\\w+\\("
                 },
                 {
                     "targetType": "ApexClass",
                     "relationship": "enqueueJob",
-                    "pattern": "System.enqueueJob(new {className}"
+                    "pattern": "System\\.enqueueJob\\(new\\s+(?P<target>\\w+)"
                 },
                 {
                     "targetType": "ApexClass",
@@ -145,7 +155,7 @@
                 {
                     "targetType": "ApexClass",
                     "relationship": "schedule",
-                    "pattern": "System.schedule(*, new {className}"
+                    "pattern": "System\\.schedule\\([^,]+,\\s*new\\s+(?P<target>\\w+)"
                 }
             ],
             "provides": [
@@ -172,7 +182,7 @@
                 {
                     "relationship": "Continuation",
                     "scope": "method",
-                    "pattern": "@AuraEnabled(continuation=true)"
+                    "pattern": "@AuraEnabled\\(continuation\\s*=\\s*true\\)"
                 },
                 {
                     "relationship": "TestVisible",
@@ -187,17 +197,17 @@
                 {
                     "relationship": "Queueable",
                     "scope": "class",
-                    "pattern": "implements Queueable"
+                    "pattern": "implements\\s+Queueable"
                 },
                 {
                     "relationship": "Batchable",
                     "scope": "class",
-                    "pattern": "implements Database.Batchable"
+                    "pattern": "implements\\s+Database\\.Batchable"
                 },
                 {
                     "relationship": "Schedulable",
                     "scope": "class",
-                    "pattern": "implements Schedulable"
+                    "pattern": "implements\\s+Schedulable"
                 }
             ]
         },
@@ -213,13 +223,13 @@
                 {
                     "targetType": "ApexClass",
                     "relationship": "controller",
-                    "pattern": "controller=\"([^\"]+)\"",
+                    "pattern": "controller=\"(?P<target>[^\"]+)\"",
                     "required": true
                 },
                 {
                     "targetType": "ApexClass",
                     "relationship": "extension",
-                    "pattern": "extensions=\"([^\"]+)\""
+                    "pattern": "extensions=\"(?P<target>[^\"]+)\""
                 },
                 {
                     "targetType": "AuraComponentBundle",
@@ -233,14 +243,14 @@
             "description": "Database DML automation trigger",
             "directory": "triggers",
             "extension": ".trigger",
-            "fileType": "text",
+            "fileType": "code",
             "hasMetaFile": true,
             "naming": "{trigger_name}.trigger",
             "consumes": [
                 {
                     "targetType": "ApexClass",
                     "relationship": "staticMethodInvocation",
-                    "pattern": "{className}.{methodName}"
+                    "pattern": "(?P<target>\\w+)\\.\\w+\\("
                 }
             ]
         },
@@ -272,27 +282,27 @@
                 {
                     "targetType": "ApexClass",
                     "relationship": "InvocableMethod",
-                    "pattern": "@InvocableMethod"
+                    "pattern": "<apexClass>(?P<target>\\w+)</apexClass>"
                 },
                 {
                     "targetType": "Flow",
-                    "relationship": "Subflow"
+                    "relationship": "Subflow",
+                    "pattern": "<flowName>(?P<target>\\w+)</flowName>"
                 },
                 {
                     "targetType": "GenAiPromptTemplate",
-                    "relationship": "PromptTemplate"
+                    "relationship": "PromptTemplate",
+                    "pattern": "<promptTemplate>(?P<target>\\w+)</promptTemplate>"
                 },
                 {
                     "targetType": "GenAiFunction",
-                    "relationship": "AgentAction"
+                    "relationship": "AgentAction",
+                    "pattern": "<actionName>(?P<target>\\w+)</actionName>"
                 },
                 {
                     "targetType": "LightningComponentBundle",
-                    "relationship": "ScreenComponent"
-                },
-                {
-                    "targetType": "ApexClass",
-                    "relationship": "ApexDefinedType"
+                    "relationship": "ScreenComponent",
+                    "pattern": "<extensionName>c:(?P<target>\\w+)</extensionName>"
                 }
             ],
             "provides": [
@@ -316,24 +326,19 @@
                 {
                     "targetType": "ApexClass",
                     "relationship": "invocationTarget",
-                    "pattern": "invocationTargetType=apex"
+                    "pattern": "<invocationTarget>(?P<target>\\w+)</invocationTarget>"
                 },
                 {
                     "targetType": "Flow",
                     "relationship": "invocationTarget",
-                    "pattern": "invocationTargetType=flow"
+                    "pattern": "<invocationTarget>(?P<target>\\w+)</invocationTarget>"
                 },
                 {
                     "targetType": "GenAiPromptTemplate",
                     "relationship": "invocationTarget",
-                    "pattern": "invocationTargetType=generatePromptResponse"
+                    "pattern": "<invocationTarget>(?P<target>\\w+)</invocationTarget>"
                 }
-            ],
-            "parameters": {
-                "description": "Maps params to Custom Lightning Types",
-                "mapsTo": "LightningTypeBundle",
-                "ref": "lightning:type"
-            }
+            ]
         },
         {
             "type": "GenAiPlannerBundle",
@@ -341,7 +346,14 @@
             "directory": "genAiPlannerBundles",
             "extension": ".genAiPlannerBundle-meta.xml",
             "fileType": "xml",
-            "parentType": "BotVersion"
+            "parentType": "BotVersion",
+            "consumes": [
+                {
+                    "targetType": "GenAiPlugin",
+                    "relationship": "subagentTopic",
+                    "pattern": "<pluginName>(?P<target>\\w+)</pluginName>"
+                }
+            ]
         },
         {
             "type": "GenAiPlugin",
@@ -349,7 +361,14 @@
             "directory": "genAiPlugins",
             "extension": ".genAiPlugin-meta.xml",
             "fileType": "xml",
-            "parentType": "GenAiPlannerBundle"
+            "parentType": "GenAiPlannerBundle",
+            "consumes": [
+                {
+                    "targetType": "GenAiFunction",
+                    "relationship": "topicAction",
+                    "pattern": "<functionName>(?P<target>\\w+)</functionName>"
+                }
+            ]
         },
         {
             "type": "GenAiPromptTemplate",
@@ -360,12 +379,14 @@
             "naming": "{prompt_name}.genAiPromptTemplate-meta.xml",
             "consumes": [
                 {
-                    "targetType": "Flow",
-                    "relationship": "DataProvider"
+                    "targetType": "ApexClass",
+                    "relationship": "DataProvider",
+                    "pattern": "\\{!Apex:(?P<target>\\w+)\\.\\w+\\}"
                 },
                 {
-                    "targetType": "ApexClass",
-                    "relationship": "DataProvider"
+                    "targetType": "Flow",
+                    "relationship": "DataProvider",
+                    "pattern": "\\{!Flow:(?P<target>\\w+)\\}"
                 }
             ]
         },
