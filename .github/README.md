@@ -1,8 +1,8 @@
-# Salesforce SKill Repository
+# Salesforce Skill Repository
 
 ## Operational Stages
 
-The framework is structured into six decoupled operational stages, driven by a specialized library of AI Skills and automation utilities.
+The framework is structured into seven decoupled operational stages, driven by a specialized library of AI Skills and automation utilities.
 
 ### 1. 📅 PLAN
 Defines the technical scope, business boundaries, and operational constraints before any code orchestration begins.
@@ -44,8 +44,8 @@ Translates analytical discoveries into highly performant system architectures an
 
 ---
 
-### 4. ⚙️ EXECUTE
-The execution and generation engine that handles automated code authorship and transactional data deployment.
+### 4. 🏗️ BUILD
+The build and generation engine that handles automated code authorship, template compilation, and localized validation preparation.
 
 #### Skills in this Section
 
@@ -55,11 +55,24 @@ The execution and generation engine that handles automated code authorship and t
 | `execute-generate-prompt` | Compiles advanced LLM prompt layouts, automatically embedding dynamic tokens and live data providers. |
 | `execute-sf-data-load` | Extracts cloud datasets as local CSVs and executes dependency-aware, sequenced bulk cloud deployments. |
 
-* **Explanation**: The proactive execution layer. These skills automate the creation of assets—writing code, composing system prompts, or deploying records sequentially based on calculated graph dependencies.
+* **Explanation**: The proactive build layer. These skills automate the creation of assets—writing code, composing system prompts, or staging records sequentially based on calculated graph dependencies and local validations.
 
 ---
 
-### 5. ⚡ OPTIMIZE
+### 5. 🚀 RELEASE
+The deployment and activation framework responsible for pushing validated metadata packages into live environments.
+
+#### Skills in this Section
+
+| Skill Name | One-Line Description |
+| :--- | :--- |
+| `release-sf-metadata` | Deploys validated Salesforce metadata to the target environment using the Salesforce CLI. |
+
+* **Explanation**: The deployment gate. This stage handles the transactional release of code and metadata to target Salesforce orgs once all upstream compilation and verification stages are passed.
+
+---
+
+### 6. ⚡ OPTIMIZE
 The review, evaluation, and quality assurance framework ensuring maximum efficiency and security compliance.
 
 #### Skills in this Section
@@ -74,7 +87,7 @@ The review, evaluation, and quality assurance framework ensuring maximum efficie
 
 ---
 
-### 6. 🛠️ UTILITY
+### 7. 🛠️ UTILITY
 The underlying cross-platform scripting workers that execute heavy computing, piping, and environment validation.
 
 #### Skills in this Section
